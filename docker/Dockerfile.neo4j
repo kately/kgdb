@@ -1,0 +1,12 @@
+ARG NEO4J_VERSION
+FROM neo4j:${NEO4J_VERSION}
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends sudo curl vim unzip ssh iputils-ping && \
+    apt-get clean
+
+ENV NEO4J_HOME=/db
+
+RUN mkdir -p /${NEO4J_HOME}/conf && \
+    mkdir -p /${NEO4J_HOME}/plugins && cd /${NEO4J_HOME}/plugins && \
+    curl -L https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/download/${NEO4J_VERSION}/apoc-${NEO4J_VERSION}-all.jar -O

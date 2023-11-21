@@ -1,0 +1,5 @@
+utils
+# knowledge graph (kg) libs
+networkx >= 2.6
+pyvis >= 0.1.7
+neo4j >=5.0.0

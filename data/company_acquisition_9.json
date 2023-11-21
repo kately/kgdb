@@ -1,0 +1,52 @@
+[
+  {
+    "parent_company_id": 1461802,
+    "acquired_company_id": 4324700,
+    "merged_into_parent_company": true
+  },
+  {
+    "parent_company_id": 3174166,
+    "acquired_company_id": 4245557,
+    "merged_into_parent_company": true
+  },
+  {
+    "parent_company_id": 3071186,
+    "acquired_company_id": 6575604,
+    "merged_into_parent_company": true
+  },
+  {
+    "parent_company_id": 157785,
+    "acquired_company_id": 5072968,
+    "merged_into_parent_company": true
+  },
+  {
+    "parent_company_id": 3205143,
+    "acquired_company_id": 3278851,
+    "merged_into_parent_company": false
+  },
+  {
+    "parent_company_id": 3278851,
+    "acquired_company_id": 2001628,
+    "merged_into_parent_company": true
+  },
+  {
+    "parent_company_id": 3314902,
+    "acquired_company_id": 4648714,
+    "merged_into_parent_company": true
+  },
+  {
+    "parent_company_id": 769816,
+    "acquired_company_id": 6619620,
+    "merged_into_parent_company": true
+  },
+  {
+    "parent_company_id": 334214,
+    "acquired_company_id": 4227227,
+    "merged_into_parent_company": true
+  },
+  {
+    "parent_company_id": 2136531,
+    "acquired_company_id": 4411473,
+    "merged_into_parent_company": false
+  }
+]

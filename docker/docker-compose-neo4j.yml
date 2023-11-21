@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  neo4j:
+    image: neo4j:${IMAGE_TAG}
+    build:
+      context: .
+      dockerfile: Dockerfile.neo4j
+
+  neo4j-db:
+    container_name: Neo4j-db
+    image: neo4j:${IMAGE_TAG}
+    volumes:
+      - ../opt/neo4j/initdb:/db/initdb     # db set-up
+      - ../opt/neo4j/data:/db/data         # location for the entire database
+      - ../opt/neo4j/logs:/db/logs         # location for the db logs
+      - ../opt/neo4j/plugins:/db/plugins   # location for .jar to use with APOC library
+      - ../opt/neo4j/import:/db/import     # location for data files to be imported
+    ports:
+      - "7474:7474"   # web client
+      - "7687:7687"   # db default port (use code to access db via bolt protocol)
+    environment:
+      - NEO4J_apoc_export_file_enabled=true
+      - NEO4J_apoc_import_file_enabled=true
+      - NEO4J_dbms_security_procedures_unrestricted=apoc.*,algo.*
+      # - NEO4J_server_memory_heap_initial_size=512m
+      # - NEO4J_server_memory_heap_max_size=4G
+      # - NEO4J_initial_dbms_default_database=neo4j
+      - NEO4J_PLUGINS=["apoc"] 
+      - NEO4J_AUTH=neo4j/N3xt@sti987
+    restart: on-failure
+    networks:
+      - neo4j_net
+
+  python-dev-client:
+    image: python:${CLIENT_IMAGE_TAG}
+    ports:
+      - '8888:8888'
+    volumes:
+      - '../conf:/app/conf'
+      - '../src:/app/src'
+      - '../data:/app/data'
+    links:
+      - neo4j-db
+    networks:
+      - neo4j_net
+
+networks:
+  neo4j_net:

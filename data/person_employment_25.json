@@ -1,0 +1,183 @@
+[
+	{
+		"company_id": 703504,
+		"person_id": 360027,
+		"employment_title": "Vice President Of Infrastructure and Operations",
+		"start_date": "2012-05-01 00:00:00",
+		"end_date": "2020-06-01 00:00:00"
+	},
+	{
+		"company_id": 3205143,
+		"person_id": 360027,
+		"employment_title": "Infra & Ops",
+		"start_date": "2010-05-01 00:00:00",
+		"end_date": "2011-06-01 00:00:00"
+	},
+	{
+		"company_id": 1514362,
+		"person_id": 3676157,
+		"employment_title": "Costumer Service",
+		"start_date": "2017-05-01 00:00:00",
+		"end_date": "2018-02-01 00:00:00"
+	},
+	{
+		"company_id": 3275429,
+		"person_id": 269241,
+		"employment_title": "Board Member",
+		"start_date": "2010-12-01 00:00:00",
+		"end_date": "2014-12-01 00:00:00"
+	},
+	{
+		"company_id": 4195836,
+		"person_id": 55043174,
+		"employment_title": "Managing Director",
+		"start_date": "2018-05-01 00:00:00",
+		"end_date": "2019-02-01 00:00:00"
+	},
+	{
+		"company_id": 5165927,
+		"person_id": 33676539,
+		"employment_title": "ICT Manager",
+		"start_date": "2010-09-01 00:00:00",
+		"end_date": "2012-04-01 00:00:00"
+	},
+	{
+		"company_id": 5543758,
+		"person_id": 45957208,
+		"employment_title": "CONTROLLING ASSISTANT",
+		"start_date": "2000-08-01 00:00:00",
+		"end_date": "2001-02-01 00:00:00"
+	},
+	{
+		"company_id": 5745329,
+		"person_id": 29749132,
+		"employment_title": "Quality Control Inspector",
+		"start_date": "2007-10-01 00:00:00",
+		"end_date": "2008-06-01 00:00:00"
+	},
+	{
+		"company_id": 6792948,
+		"person_id": 128607027,
+		"employment_title": "Chief Operating Officer",
+		"start_date": "2021-11-01 00:00:00",
+		"end_date": null
+	},
+	{
+		"company_id": 11258021,
+		"person_id": 158265931,
+		"employment_title": "Commercial Lines Agent",
+		"start_date": null,
+		"end_date": null
+	},
+	{
+		"company_id": 3205143,
+		"person_id": 155401309,
+		"employment_title": "Head of Music Supervision",
+		"start_date": null,
+		"end_date": null
+	},
+	{
+		"company_id": 3205143,
+		"person_id": 257466,
+		"employment_title": "Head Recruitment - Microsoft Mobiles India",
+		"start_date": "2014-10-01 00:00:00",
+		"end_date": "2015-01-01 00:00:00"
+	},
+	{
+		"company_id": 3205143,
+		"person_id": 17376112,
+		"employment_title": "Outlook MobileTechnical Support",
+		"start_date": "2021-04-01 00:00:00",
+		"end_date": null
+	},
+	{
+		"company_id": 3205143,
+		"person_id": 362511,
+		"employment_title": "Software Engineer Intern",
+		"start_date": "2015-03-01 00:00:00",
+		"end_date": "2015-06-01 00:00:00"
+	},
+	{
+		"company_id": 3205143,
+		"person_id": 362511,
+		"employment_title": "Software Engineer Intern",
+		"start_date": "2016-06-01 00:00:00",
+		"end_date": "2016-09-01 00:00:00"
+	},
+	{
+		"company_id": 3205143,
+		"person_id": 362511,
+		"employment_title": "Software Engineer Intern",
+		"start_date": "2014-06-01 00:00:00",
+		"end_date": "2014-09-01 00:00:00"
+	},
+	{
+		"company_id": 3205143,
+		"person_id": 362511,
+		"employment_title": "Explore Intern",
+		"start_date": "2013-06-01 00:00:00",
+		"end_date": "2013-09-01 00:00:00"
+	},
+	{
+		"company_id": 3205143,
+		"person_id": 245181,
+		"employment_title": "Senior Lead Program Manager",
+		"start_date": "1999-02-01 00:00:00",
+		"end_date": "2017-02-01 00:00:00"
+	},
+	{
+		"company_id": 3205143,
+		"person_id": 155373147,
+		"employment_title": "Sr. Product Marketing Manager - Azure IoT & data platform commercial lead",
+		"start_date": "2016-07-01 00:00:00",
+		"end_date": "2017-12-31 00:00:00"
+	},
+	{
+		"company_id": 3205143,
+		"person_id": 339172,
+		"employment_title": "Software Engineer Intern",
+		"start_date": "2014-06-01 00:00:00"
+	},
+	{
+		"company_id": 3278851,
+		"person_id": 339172,
+		"employment_title": "Software Engineer Intern",
+		"start_date": "2012-06-01 00:00:00",
+		"end_date": "2013-08-01 00:00:00"
+	},
+	{
+		"company_id": 4245557,
+		"person_id": 3818878,
+		"employment_title": "Co-Founder",
+		"start_date": "2020-04-01 00:00:00",
+		"end_date": null
+	},
+	{
+		"company_id": 5072968,
+		"person_id": 45486726,
+		"employment_title": "Commercial Analyst",
+		"start_date": "2016-02-01 00:00:00",
+		"end_date": "2017-02-01 00:00:00"
+	},
+	{
+		"company_id": 6575604,
+		"person_id": 156631661,
+		"employment_title": "Growth & Web3.0 Fellow",
+		"start_date": "2022-01-01 00:00:00",
+		"end_date": "2022-04-01 00:00:00"
+	},
+	{
+		"company_id": 1431037,
+		"person_id": 110139,
+		"employment_title": "Advisory Board Member",
+		"start_date": "2020-01-01 00:00:00",
+		"end_date": "2021-12-01 00:00:00"
+	},
+	{
+		"company_id": 1500356,
+		"person_id": 354775,
+		"employment_title": "Business Development Intern",
+		"start_date": "2015-06-01 00:00:00",
+		"end_date": "2015-08-01 00:00:00"
+	}
+]

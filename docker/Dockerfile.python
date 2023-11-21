@@ -1,0 +1,38 @@
+FROM ubuntu:ubuntu_base_20.04 as build-base
+
+ARG PYTHON_VERSION
+
+# Install python and its dependent packages
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends sudo curl vim unzip ssh iputils-ping && \
+    apt-get install -y software-properties-common && \
+    apt-add-repository ppa:deadsnakes/ppa && \
+    apt-get install python${PYTHON_VERSION} -y && apt install python3-pip -y && \
+    apt-get install python3-dev python3-venv && \
+    pip3 install --upgrade pip && \
+    pip3 install flake8 && \
+    pip3 install jupyter && pip3 install jupyterlab && \
+    mkdir /usr/local/notebooks && \
+    apt-get clean
+
+# Install any Python modules required in the notebook
+RUN pip3 install pandas && pip3 install numpy && \ 
+    pip3 install python-dotenv && \
+    pip3 install pathlib && \
+    pip3 install utils
+
+# Install Python libraries
+COPY requirements.txt .
+RUN pip install -r requirements.txt --no-cache-dir
+
+
+FROM build-base as python-base
+
+# Set PATHs
+RUN export PYTHON=python3
+
+RUN groupadd --gid 1000 app && \
+    useradd --uid 1000 --gid 1000 -d /app -m -s /bin/bash app && \
+    chown -R app:app /app
+USER app
+WORKDIR /app
