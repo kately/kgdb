@@ -1,12 +1,12 @@
 import os
-import json
 import logging
+from common.utils import load_file
 from typing import Dict
 from pprint import pprint
 from neo4j import GraphDatabase
 # from pyvis.network import Network
 
-from sourcer import (
+from kgraph.sourcer import (
     DataSourcer,
     CompaniesSourcer,
     AcquiredCompaniesSourcer,
@@ -87,12 +87,7 @@ class KnowledgeGraph:
 
     @staticmethod
     def config(filepath: str) -> Dict:
-        if filepath is None or not (os.path.exists(filepath)):
-            raise Exception(f"Failed to load file; invalid file (={filepath})")
-
-        with open(filepath) as fh:
-            data = json.load(fh)
-        return data
+        return load_file(filepath)
 
 
 if __name__ == "__main__":

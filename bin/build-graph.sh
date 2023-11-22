@@ -1,13 +1,17 @@
 #!/bin/bash
-base_path=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
+script_path=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
+app_home=$(pwd)
 
-echo "base_path: ${base_path}"
+echo "++++++++++"
+echo "app_home: ${app_home}"
+echo "script_path: ${script_path}"
+echo "++++++++++"
 
-# src dir
-src_dir="${base_path}/../src"
+cd ${app_home}
+export PYTHONPATH="${app_home}/src"
 
 # run python linter check
 flake8 
 
 # run app
-python3 ${src_dir}/kgraph/kg.py
+python3 src/kgraph/kg.py

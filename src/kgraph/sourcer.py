@@ -1,6 +1,6 @@
 import os
-import json
 import logging
+from common.utils import load_file
 from typing import Dict
 # from pprint import pprint
 
@@ -23,13 +23,7 @@ class DataSourcer(object):
 
     @staticmethod
     def load_file(filepath: str) -> Dict:
-        if filepath is None or not (os.path.exists(filepath)):
-            raise Exception(f"Failed to load file; invalid file (={filepath})")
-
-        with open(filepath) as fh:
-            data = json.load(fh)
-        # pprint(data)
-        return data
+        return load_file(filepath)
 
 
 class CompaniesSourcer(DataSourcer):
