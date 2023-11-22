@@ -49,7 +49,7 @@ class KnowledgeGraph:
         try:
             # managed transaction with Session.execute_read()
             # method takes a transaction function callback;
-            # responsible for actually carrying out the queries 
+            # responsible for actually carrying out the queries
             #     and processing the result
             with self.__driver.session(
                     database=self.__db_config.get("database")) as session:
@@ -88,7 +88,7 @@ class KnowledgeGraph:
     @staticmethod
     def config(filepath: str) -> Dict:
         if filepath is None or not (os.path.exists(filepath)):
-            raise Exception("Failed to load file; invalid file (=$filepath)")
+            raise Exception(f"Failed to load file; invalid file (={filepath})")
 
         with open(filepath) as fh:
             data = json.load(fh)
@@ -96,23 +96,27 @@ class KnowledgeGraph:
 
 
 if __name__ == "__main__":
+    cwd = os.getcwd()
+    data_path = f"{cwd}/data"
+    conf_path = f"{cwd}/conf"
+
     # load companies from json file
     comp_sourcer = CompaniesSourcer()
-    companies = comp_sourcer.collect_data(file="../data/companies_100.json")
+    companies = comp_sourcer.collect_data(file=f"{data_path}/companies_100.json")   # noqa
     logging.info(f"Loaded {len(companies)} companies")
 
     # load acquired_companies from json file
     acq_sourcer = AcquiredCompaniesSourcer()
-    acq_companies = acq_sourcer.collect_data(file="../data/company_acquisition_9.json")   # noqa
+    acq_companies = acq_sourcer.collect_data(file=f"{data_path}/company_acquisition_9.json")   # noqa
     logging.info(f"Loaded {len(acq_companies)} acquired companies")
 
     # load employees from json file
     emp_sourcer = EmployedPersonsSourcer()
-    employees = emp_sourcer.collect_data(file="../data/person_employment_25.json")   # noqa
+    employees = emp_sourcer.collect_data(file=f"{data_path}/person_employment_25.json")   # noqa
     logging.info(f"Loaded {len(employees)} employees")
 
     # connect to our neo4j database
-    with KnowledgeGraph(config="../conf/test_config.json") as kg:
+    with KnowledgeGraph(config=f"{conf_path}/test_config.json") as kg:
         kg.load_data(sourcer=comp_sourcer, name="org", pkey="org_id")
         kg.load_data(sourcer=acq_sourcer, name="acquired_org", pkey="sub_id")
         kg.load_data(sourcer=emp_sourcer, name="person", pkey="person_id")

@@ -24,7 +24,7 @@ class DataSourcer(object):
     @staticmethod
     def load_file(filepath: str) -> Dict:
         if filepath is None or not (os.path.exists(filepath)):
-            raise Exception("Failed to load file; invalid file (=$filepath)")
+            raise Exception(f"Failed to load file; invalid file (={filepath})")
 
         with open(filepath) as fh:
             data = json.load(fh)
@@ -86,7 +86,7 @@ class AcquiredCompaniesSourcer(DataSourcer):
         # batch update with map
         result = txn.run(
             """
-            // add or update subcompany 
+            // add or update subcompany
             UNWIND $batch AS obj
             MERGE (s:Subsidiary {acquired_company_id: obj.acquired_company_id})
             ON CREATE SET s = obj, s.created = timestamp()
@@ -100,7 +100,8 @@ class AcquiredCompaniesSourcer(DataSourcer):
             ON CREATE SET r.created = timestamp()
             ON MATCH SET r.accessTime = timestamp()
 
-            RETURN org.company_id AS org_id, sub.acquired_company_id AS sub_org_id
+            RETURN org.company_id AS org_id,
+                   sub.acquired_company_id AS sub_org_id
             """,
             batch=batch
         )
@@ -128,7 +129,7 @@ class EmployedPersonsSourcer(DataSourcer):
     # @unit_of_work(timeout=10, metadata={"employees"})
     def get_updater(self, txn, batch):
         assert batch is not None, "Batch of entities is not defined!"
-        assert len(batch) > 0, "Batch of entities is empty!" 
+        assert len(batch) > 0, "Batch of entities is empty!"
 
         # create new node with given attributes, if not exists already
         # add or update org and person relationship
@@ -158,17 +159,17 @@ class EmployedPersonsSourcer(DataSourcer):
             WITH employee as p, date() AS current_date
             MATCH (emp:Person WHERE emp.person_id = p.person_id)
             MATCH (org:Organization)
-            WHERE org.company_id = p.company_id AND 
-                  p.end_date IS NOT NULL AND 
+            WHERE org.company_id = p.company_id AND
+                  p.end_date IS NOT NULL AND
                   date(datetime(replace(p.end_date, " ", "T"))) < current_date
             MERGE (p)-[ex:EX_EMPLOYEE_OF]->(org)
             ON CREATE SET ex.created = timestamp()
             ON MATCH SET ex.accessTime = timestamp()
             // remove workAt relationship for ex-employee
-            WITH p 
-            MATCH (p)-[r:WORKS_AT]->(org)  
-            DELETE r   
-        
+            WITH p
+            MATCH (p)-[r:WORKS_AT]->(org)
+            DELETE r
+
             RETURN p.org_id AS org_id, p.person_id AS person_id
             """,
             batch=batch
@@ -184,17 +185,21 @@ class EmployedPersonsSourcer(DataSourcer):
 
 
 if __name__ == "__main__":
+    cwd = os.getcwd()
+    data_path = f"{cwd}/data"
+    conf_path = f"{cwd}/conf"
+
     # load companies from json file
     comp_sourcer = CompaniesSourcer()
-    companies = comp_sourcer.collect_data(file="../data/companies_100.json")
+    companies = comp_sourcer.collect_data(file=f"{data_path}/companies_100.json")   # noqa
     logging.info(f"Loaded {len(companies)} companies")
 
     # load acquired_companies from json file
     acq_sourcer = AcquiredCompaniesSourcer()
-    acq_companies = acq_sourcer.collect_data(file="../data/company_acquisition_9.json")   # noqa
+    acq_companies = acq_sourcer.collect_data(file=f"{data_path}/company_acquisition_9.json")   # noqa
     logging.info(f"Loaded {len(acq_companies)} acquired companies")
 
     # load employees from json file
-    emp_sourcer = EmployedPersonSourcer()
-    employees = emp_sourcer.collect_data(file="../data/person_employment_25.json")   # noqa
+    emp_sourcer = EmployedPersonsSourcer()
+    employees = emp_sourcer.collect_data(file=f"{data_path}/person_employment_25.json")   # noqa
     logging.info(f"Loaded {len(employees)} employees")
