@@ -1,4 +1,7 @@
 utils
+# kafka & spark
+kafka-python >= 2.0.2
+pyspark >= 3.4.0
 # knowledge graph (kg) libs
 networkx >= 2.6
 pyvis >= 0.1.7

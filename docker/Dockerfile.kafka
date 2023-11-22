@@ -1,0 +1,2 @@
+ARG KAFKA_VERSION
+FROM bitnami/kafka:${KAFKA_VERSION}

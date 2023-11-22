@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  zookeeper-bin:
+    image: zookeeper:${ZK_IMAGE_TAG}
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile.zookeeper
+
+  zookeeper:
+    container_name: Kafka-zk
+    image: zookeeper:${ZK_IMAGE_TAG}
+    ports:
+      - "2181:2181"
+    volumes:
+      - "zookeeper-volume:/bitnami"
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    restart: always
+    networks:
+      - kg_kf_network
+
+  kafka-bin:
+    image: kafka:${KF_IMAGE_TAG}
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile.kafka
+
+  kafka:
+    container_name: Kafka-kf
+    image: kafka:${KF_IMAGE_TAG}
+    ports:
+      - "9093:9093"
+    volumes:
+      - "kafka-volume:/bitnami"
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka:9092,EXTERNAL://localhost:9093
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=CLIENT
+    depends_on:
+      - zookeeper
+    restart: always
+    networks:
+      - kg_kf_network
+
+networks:
+  kg_kf_network:
+
+volumes:
+  kafka-volume:
+  zookeeper-volume:

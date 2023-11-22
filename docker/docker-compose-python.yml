@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  python-bin:
+    image: python:${IMAGE_TAG}
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile.python
+
+  python-dev:
+    image: python:${IMAGE_TAG}
+    ports:
+      - '8888:8888'
+    volumes:
+      - '../conf:/app/conf'
+      - '../src:/app/src'
+      - '../data:/app/data'
+      - '../bin:/app/bin'
+    networks:
+      - kg_kf_network
+
+networks:
+  kg_kf_network:
