@@ -14,6 +14,7 @@ class DataSourcer(object):
     def __init__(self, name: str):
         self.name = name
         self.dataset = dict()
+        logging.basicConfig(level=logging.INFO)
 
     def collect_data(self, file: str):
         raise Exception("NotImplementedException")

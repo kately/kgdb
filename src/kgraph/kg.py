@@ -1,7 +1,6 @@
 import os
 import logging
 from common.utils import load_file
-from typing import Dict
 from pprint import pprint
 from neo4j import GraphDatabase
 # from pyvis.network import Network
@@ -20,12 +19,14 @@ from kgraph.sourcer import (
 
 class KnowledgeGraph:
     def __init__(self, config: str):
-        self.__config = KnowledgeGraph.config(config)
+        self.__config = load_file(config)
         self.__db_config = self.__config.get("neo4j")
         self.__uri = "bolt://{}:{}".format(
                         self.__db_config.get("host"),
                         self.__db_config.get("port"))
         self.__driver = None
+        logging.basicConfig(level=logging.INFO)
+
         try:
             self.__driver = GraphDatabase.driver(
                                self.__uri,
@@ -84,10 +85,6 @@ class KnowledgeGraph:
         # must close the driver connection when done
         if self.__driver is not None:
             self.__driver.close()
-
-    @staticmethod
-    def config(filepath: str) -> Dict:
-        return load_file(filepath)
 
 
 if __name__ == "__main__":

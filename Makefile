@@ -4,21 +4,15 @@ JAVA_VERSION = 11
 SPARK_VERSION = 3.4.1
 PYTHON_VERSION = 3.9
 NEO4J_VERSION = 5.13.0
+KAFKA_VERSION = 3.3
+ZOOKEEPER_VERSION = 3.8
 
-.PHONY: clear-dangling-imgs
-clear-dangling-imgs:
-        IMG=$(shell docker images | grep none | awk '{print $$3}'); echo "$$IMG"; \
-        [ -z "$$IMG" ] || (docker image rmi $$IMG)
-
-.PHONY: unset-neo4j-db
-unset-neo4j-db: clear-dangling-imgs
-	CID=$(shell docker ps -a | grep neo4j | awk '{print $$1}'); echo $$CID; \
-	[ -z "$$CID" ] || (docker stop $$CID && docker rm $$CID)
-	IMG=$(shell docker images | grep neo4j | awk '{print $$3}'); echo "$$IMG"; \
-	[ -z "$$IMG" ] || (docker image rmi $$IMG)
+# ================
+# Graph DB: Neo4j
+# ================
 
 .PHONY: set-neo4j-db
-set-neo4j-db: unset-neo4j-db
+set-neo4j-db: clean-images
 	IMAGE_TAG=neo4j-${NEO4J_VERSION} \
 	docker-compose --file docker/docker-compose-neo4j.yml build \
                        --build-arg NEO4J_VERSION=${NEO4J_VERSION} \
@@ -37,13 +31,74 @@ neo4j-db-down:
 neo4j-shell:
 	docker exec -it Neo4j-db cypher-shell -u neo4j -p N3xt@sti987
 
+# ================
+# Python Dev
+# ================
+
+.PHONY: build-python
+build-python: clean-images
+	IMAGE_TAG=python-bin-${PYTHON_VERSION} \
+        docker-compose --file docker/docker-compose-python.yml build \
+                       --build-arg PYTHON_VERSION=${PYTHON_VERSION} \
+                       --no-cache python-bin
+
 .PHONY: run-pyclient
 run-pyclient:
-	IMAGE_TAG=neo4j-${NEO4J_VERSION} \
-	CLIENT_IMAGE_TAG=python-bin-${PYTHON_VERSION} \
-        docker-compose --file docker/docker-compose-neo4j.yml run \
-                       --rm -it --entrypoint /bin/bash python-dev-client
+	IMAGE_TAG=python-bin-${PYTHON_VERSION} \
+        docker-compose --file docker/docker-compose-python.yml run \
+                       --rm -it --entrypoint /bin/bash python-dev
+
+# ================
+# Msg Q: Kafka
+# ================
+
+.PHONY: build-zookeeper
+build-zookeeper: clean-images
+	ZK_IMAGE_TAG=kafka-zk-${ZOOKEEPER_VERSION} \
+	KF_IMAGE_TAG=kafka-kf-${KAFKA_VERSION} \
+        docker-compose --file docker/docker-compose-kafka.yml build \
+                       --build-arg ZOOKEEPER_VERSION=${ZOOKEEPER_VERSION} \
+                       --no-cache zookeeper-bin
+
+.PHONY: build-kafka
+build-kafka: clean-images
+	ZK_IMAGE_TAG=kafka-zk-${ZOOKEEPER_VERSION} \
+	KF_IMAGE_TAG=kafka-kf-${KAFKA_VERSION} \
+        docker-compose --file docker/docker-compose-kafka.yml build \
+                       --build-arg KAFKA_VERSION=${KAFKA_VERSION} \
+                       --no-cache kafka-bin
+
+.PHONY: kafka-up
+kafka-up: build-zookeeper build-kafka
+	ZK_IMAGE_TAG=kafka-zk-${ZOOKEEPER_VERSION} \
+	KF_IMAGE_TAG=kafka-kf-${KAFKA_VERSION} \
+        docker-compose --file docker/docker-compose-kafka.yml up kafka
+
+.PHONY: kafka-down
+kafka-down: build-zookeeper build-kafka
+	ZK_IMAGE_TAG=kafka-zk-${ZOOKEEPER_VERSION} \
+	KF_IMAGE_TAG=kafka-kf-${KAFKA_VERSION} \
+        docker-compose --file docker/docker-compose-kafka.yml down kafka
+
+# ================
+# Helpers
+# ================
+
+.PHONY: clear-dangling-imgs
+clear-dangling-imgs:
+	IMG=$(shell docker images | grep none | awk '{print $$3}'); echo "$$IMG"; \
+        [ -z "$$IMG" -a "$$IMG" != "IMAGE" ] || (docker image rmi $$IMG) && echo "Removed img '$$IMG'"
+
+.PHONY: clean-images
+clean-images: clear-dangling-imgs
+	CID=$(shell docker ps -a | grep $(PARAM) | awk '{print $$1}'); \
+        [ -z "$$CID" -a "$$CID" != "CONTAINER" ] || (docker stop $$CID) && echo "Stopped container '$$CID'"; \
+        [ -z "$$CID" -a "$$CID" != "CONTAINER" ] || (docker rm $$CID) && echo "Removed container '$$CID'"
+	IMG=$(shell docker images | grep $(PARAM) | awk '{print $$3}'); \
+        [ -z "$$IMG" -a "$$IMG" != "IMAGE" ] || (docker image rmi $$IMG) && echo "Removed img '$$IMG'"
 
 .PHONY: clean
-clean:
+clean: clean-images
 	echo "Done"
+
+# PARAM=value make clean
