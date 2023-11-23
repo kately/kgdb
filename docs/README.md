@@ -5,9 +5,9 @@ These are the technologies used in the solution.
 * Message Queue: Kafka/Zookeeper
 * Computing Engine: PySpark
 
-The env is set-up in docker containers. Each service runs in separate container and set-up to communicate through 'host' network.
+The dev env is set-up for docker containerization. Each service runs in separate container and set-up to communicate through 'host' network.
 
-<img width="500" alt="Screenshot 2023-11-23 at 5 10 32 AM" src="https://github.com/kately/kgdb/assets/9557623/7d9d30f1-9d93-4530-b261-849993779d04">
+<img width="700" alt="Screenshot 2023-11-23 at 9 51 06 AM" src="https://github.com/kately/kgdb/assets/9557623/cce8fae9-8010-4309-b307-b3393c444b5e">
 
 ## Requirements
 * Docker
