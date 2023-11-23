@@ -48,7 +48,8 @@ The docker image is build to run PySpark.
    # Run message updates
    ./bin/kafka-producer.sh  
    ```
-5) This client uses for querying Neo4J
+5) This client uses for querying Neo4J.
+   Use this link to Neo4J interactive browser. `http://localhost:7474/browser/`
    ```
    # Launch Cypher shell to query the KG/Neo4J.
    make neo4j-shell
