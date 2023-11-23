@@ -26,7 +26,41 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt --no-cache-dir
 
 
-FROM build-base as python-base
+FROM build-base as pyspark
+
+ARG SPARK_VERSION
+ARG JAVA_VERSION
+
+RUN apt-get install -y --no-install-recommends openjdk-${JAVA_VERSION}-jdk && \
+    apt-get clean
+
+RUN pip3 install pyspark
+
+RUN mkdir -p /opt && \
+    cd /opt && \
+    curl http://dlcdn.apache.org/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop3.tgz | tar -zx && \
+    ln -s spark-${SPARK_VERSION}-bin-hadoop3 spark && echo Spark ${SPARK_VERSION} installed in /opt
+
+# Set PATHs
+ENV SPARK_HOME /opt/spark
+ENV PATH $PATH:$SPARK_HOME/bin:$SPARK_HOME/sbin
+RUN export HADOOP_OPTS="$HADOOP_OPTS -Djava.library.path=$HADOOP_HOME/lib/native"
+ENV JAVA HOME="/usr/lib/jvm/java-${JAVA_VERSION}-openjdk-amd64"
+RUN export PATH=$PATH:$SPARKHOME/bin
+RUN export PYTHONPATH=$SPARK_HOME/python:$PYTHONPATH
+RUN export PYSPARK_PYTHON=python3
+RUN export PATH=$PATH:$JAVA_HOME/bin
+
+# Adds custom log4j.properties to Spark conf/
+COPY log4j.properties /opt/spark/conf/
+
+
+FROM pyspark as neo4j
+
+COPY lib/neo4j-connector-apache-spark_*.jar /opt/spark/jars/
+
+
+FROM neo4j as final
 
 # Set PATHs
 RUN export PYTHON=python3

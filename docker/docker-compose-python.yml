@@ -8,6 +8,7 @@ services:
       dockerfile: docker/Dockerfile.python
 
   python-dev:
+    container_name: pyspark
     image: python:${IMAGE_TAG}
     ports:
       - '8888:8888'

@@ -7,18 +7,20 @@ NEO4J_VERSION = 5.13.0
 KAFKA_VERSION = 3.3
 ZOOKEEPER_VERSION = 3.8
 
+build-all: build-zookeeper build-kafka build-python build-neo4j-db
+
 # ================
 # Graph DB: Neo4j
 # ================
 
-.PHONY: set-neo4j-db
-set-neo4j-db: clean-images
+.PHONY: build-neo4j-db
+build-neo4j-db: clean-images
 	IMAGE_TAG=neo4j-${NEO4J_VERSION} \
 	docker-compose --file docker/docker-compose-neo4j.yml build \
                        --build-arg NEO4J_VERSION=${NEO4J_VERSION} \
                        --no-cache neo4j
 .PHONY: neo4j-db-up
-neo4j-db-up: set-neo4j-db
+neo4j-db-up:
 	IMAGE_TAG=neo4j-${NEO4J_VERSION} \
 	docker-compose --file docker/docker-compose-neo4j.yml up neo4j-db
 
@@ -40,6 +42,8 @@ build-python: clean-images
 	IMAGE_TAG=python-bin-${PYTHON_VERSION} \
         docker-compose --file docker/docker-compose-python.yml build \
                        --build-arg PYTHON_VERSION=${PYTHON_VERSION} \
+                       --build-arg JAVA_VERSION=${JAVA_VERSION} \
+                       --build-arg SPARK_VERSION=${SPARK_VERSION} \
                        --no-cache python-bin
 
 .PHONY: run-pyclient
