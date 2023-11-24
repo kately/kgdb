@@ -7,6 +7,9 @@ NEO4J_VERSION = 5.13.0
 KAFKA_VERSION = 3.3
 ZOOKEEPER_VERSION = 3.8
 
+NEO4J_DATABASE_USER = $(shell echo $${NEO4J_DATABASE_USERNAME-neo4j})
+NEO4J_DATABASE_PASS = $(shell echo $${NEO4J_DATABASE_PASSWORD-test@!123})
+
 build-all: build-zookeeper build-kafka build-python build-neo4j-db
 
 # ================
@@ -16,13 +19,16 @@ build-all: build-zookeeper build-kafka build-python build-neo4j-db
 .PHONY: build-neo4j-db
 build-neo4j-db: clean-images
 	IMAGE_TAG=neo4j-${NEO4J_VERSION} \
-	docker-compose --file docker/docker-compose-neo4j.yml build \
+        docker-compose --file docker/docker-compose-neo4j.yml build \
                        --build-arg NEO4J_VERSION=${NEO4J_VERSION} \
                        --no-cache neo4j
 .PHONY: neo4j-db-up
 neo4j-db-up:
+	@echo NEO4J_DATABASE_USERNAME=$(NEO4J_DATABASE_USER); \
 	IMAGE_TAG=neo4j-${NEO4J_VERSION} \
-	docker-compose --file docker/docker-compose-neo4j.yml up neo4j-db
+        NEO4J_DATABASE_USERNAME=$(NEO4J_DATABASE_USER) \
+        NEO4J_DATABASE_PASSWORD=$(NEO4J_DATABASE_PASS) \
+        docker-compose --file docker/docker-compose-neo4j.yml up neo4j-db
 
 .PHONY: neo4j-db-down 
 neo4j-db-down:
@@ -31,7 +37,9 @@ neo4j-db-down:
 
 .PHONY: neo4j-shell
 neo4j-shell:
-	docker exec -it Neo4j-db cypher-shell -u neo4j -p N3xt@sti987
+	NEO4J_DATABASE_USERNAME=$(NEO4J_DATABASE_USER) \
+	NEO4J_DATABASE_PASSWORD=$(NEO4J_DATABASE_PASS) \
+	docker exec -it Neo4j-db cypher-shell -u $(NEO4J_DATABASE_USER) -p $(NEO4J_DATABASE_PASS)
 
 # ================
 # Python Dev

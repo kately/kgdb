@@ -23,10 +23,13 @@ services:
       # - NEO4J_server_memory_heap_max_size=4G
       # - NEO4J_initial_dbms_default_database=neo4j
       - NEO4J_PLUGINS=["apoc"] 
-      - NEO4J_AUTH=neo4j/N3xt@sti987   # secret should be encrypted
+      - NEO4J_AUTH=${NEO4J_DATABASE_USERNAME-neo4j}/${NEO4J_DATABASE_PASSWORD:-test@!123}
     restart: on-failure
     networks:
       - kg_kf_network
+    # command: bash -c "
+    #     echo ${NEO4J_DATABASE_USERNAME}/${NEO4J_DATABASE_PASSWORD}
+    #  "
 
 networks:
   kg_kf_network:

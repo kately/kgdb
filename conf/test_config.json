@@ -1,0 +1,13 @@
+{
+  "neo4j": {
+     "database": "neo4j",
+     "host": "Neo4j-db",
+     "port": 7687, 
+     "user": "neo4j",
+     "password": "test@!123"
+  },
+  "kafka": {
+     "broker_host": "Kafka-kf",
+     "broker_port": 9092
+  }
+}
