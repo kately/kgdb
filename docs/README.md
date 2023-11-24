@@ -9,8 +9,7 @@ The dev env is set-up for docker containerization. Each service runs in separate
 
 | Design HL | Process |
 | ------- | ------- |
-| <img width="500" alt="Screenshot 2023-11-24 at 5 33 44 AM" src="https://github.com/kately/kgdb/assets/9557623/5b988c0a-7ac5-482d-bc24-eeeb6f9801b0"> | <img width="500" alt="Screenshot 2023-11-24 at 7 08 06 AM" src="https://github.com/kately/kgdb/assets/9557623/44db7e72-d74e-4ffc-a019-073110e5b87e">
- |
+| <img width="500" alt="Screenshot 2023-11-24 at 5 33 44 AM" src="https://github.com/kately/kgdb/assets/9557623/5b988c0a-7ac5-482d-bc24-eeeb6f9801b0"> | <img width="500" alt="Screenshot 2023-11-24 at 9 20 37 AM" src="https://github.com/kately/kgdb/assets/9557623/57b46ae8-c5e9-4044-93fd-2f32084efb1e"> |
 
 ## Requirements
 * Docker
@@ -46,7 +45,7 @@ The docker image is build to run PySpark.
    PARAM=python make run-pyclient
 
    # Build and seed db with sample data
-   ./bin/build-graph.sh
+   ./bin/neo4j-build-graph.sh
 
    # Create Kafka topics
    ./bin/kafka-topics.sh --create Y
