@@ -7,7 +7,10 @@ These are the technologies used in the solution.
 
 The dev env is set-up for docker containerization. Each service runs in separate container and set-up to communicate through 'host' network.
 
-<img width="700" alt="Screenshot 2023-11-23 at 9 51 06 AM" src="https://github.com/kately/kgdb/assets/9557623/cce8fae9-8010-4309-b307-b3393c444b5e">
+| Design HL | Process |
+| ------- | ------- |
+| <img width="500" alt="Screenshot 2023-11-24 at 5 33 44 AM" src="https://github.com/kately/kgdb/assets/9557623/5b988c0a-7ac5-482d-bc24-eeeb6f9801b0"> | <img width="500" alt="Screenshot 2023-11-24 at 7 08 06 AM" src="https://github.com/kately/kgdb/assets/9557623/44db7e72-d74e-4ffc-a019-073110e5b87e">
+ |
 
 ## Requirements
 * Docker
@@ -25,7 +28,7 @@ git clone git@github.com:kately/kgdb.git
    ```
 2) Start-up Kafka/Zookeeper. Running this target will bring up both Zookeeper and Kafka.
    ```
-   # Launch Kafka
+   # Launch Kafka server
    PARAM=kafka make kafka-up
    ```
 3) Start-up graph database Neo4j
@@ -37,16 +40,22 @@ Start-up 2 separate Python clients.
 One will be used for managing Kafka updates while the other could be use to query the updates to Neo4J.
 The docker image is build to run PySpark.
 
-4) This client uses for kafka topics set-up and producing updates. 
+4) This client uses for kafka topics set-up and producing updates, Spark load and graph db/Neo4j initialize and seed sample data. 
    ```
-   # Launch client for managing update to Kafka
+   # Launch client for managing update to Kafka, Spark load, graph db update
    PARAM=python make run-pyclient
+
+   # Build and seed db with sample data
+   ./bin/build-graph.sh
 
    # Create Kafka topics
    ./bin/kafka-topics.sh --create Y
    
-   # Run message updates
-   ./bin/kafka-producer.sh  
+   # Generate and run message updates
+   ./bin/kafka-producer.sh
+
+   # Run spark load
+   ./bin/pyspark-loader.sh 
    ```
 5) This client uses for querying Neo4J.
    Use this link to Neo4J interactive browser. `http://localhost:7474/browser/`
