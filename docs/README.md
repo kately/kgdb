@@ -5,7 +5,7 @@ These are the technologies used in the solution.
 * Message Queue: Kafka/Zookeeper
 * Computing Engine: PySpark
 
-The dev env is set-up for docker containerization. Each service runs in separate container and set-up to communicate through 'host' network.
+The dev env is set-up for docker containerization, composed of a Kafka service, a Neo4j graph db, and two python client with PySpark. 
 
 | Design HL | Process |
 | ------- | ------- |
