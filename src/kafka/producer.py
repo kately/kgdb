@@ -35,9 +35,14 @@ if __name__ == "__main__":
     conf_path = f"{cwd}/conf"
 
     # create data set
-    companies = [
+    companies_1 = [
         {"company_id": 1, "company_name": "ABC 01", "headcount": 200},
         {"company_id": 2, "company_name": "SUB ABC 01", "headcount": 20},
+    ]
+
+    companies_2 = [
+        {"company_id": 2, "company_name": "SUB ABC 01", "headcount": 500},
+        {"company_id": 3, "company_name": "SUB XYZ", "headcount": 30},
     ]
 
     acq_companies = [
@@ -56,6 +61,7 @@ if __name__ == "__main__":
 
     # submit data to kafka
     producer = Producer(config=f"{conf_path}/test_config.json")
-    producer.submit(topic="companies", events=companies)
-    producer.submit(topic="acq_companies", events=acq_companies)
-    producer.submit(topic="persons", events=persons)
+    producer.submit(topic="companies", events=companies_1)
+    producer.submit(topic="companies", events=companies_2)
+    # producer.submit(topic="acq_companies", events=acq_companies)
+    # producer.submit(topic="persons", events=persons)
