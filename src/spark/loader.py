@@ -42,6 +42,8 @@ org_schema = T.StructType([
 
 class KafkaToNeo4jTransformer:
     def __init__(self, config: str, topic_to_node_map: Dict):
+        assert topic_to_node_map is not None and len(topic_to_node_map) > 0, "topic_to_node_map mapping is required"
+
         self.__config = load_file(config)
         self.__kf_cfg = self.__config.get("kafka")
         self.__db_cfg = self.__config.get("neo4j")
@@ -54,6 +56,13 @@ class KafkaToNeo4jTransformer:
             .appName("Kafka-to-Neo4j-Loader") \
             .getOrCreate()
         logging.basicConfig(level=logging.INFO)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        wait_time_seconds = 300   # 5 minutes
+        self.stop_stream_query(self.query, wait_time_seconds)
 
     def start_stream_query(self):
         kf_uri = f"{self.__kf_cfg.get('broker_host')}:{self.__kf_cfg.get('broker_port')}"  # noqa
@@ -75,12 +84,7 @@ class KafkaToNeo4jTransformer:
                        .select(F.col("cols"),
                                flatten_jsondict_to_columns_udf(
                                    F.col("cols"), org_schema).alias("attrs")) \
-                       .select(F.col("attrs"))
-
-        for field in grdf.schema.fields:
-            if field.name.startswith("attrs"):
-                grdf = grdf.withColumnRenamed(
-                        field.name, field.name.replace("attrs.", ""))
+                       .select(F.col("attrs.*"))
         grdf.printSchema()
 
         # TODO: identify the label to use for the given batch
@@ -89,7 +93,7 @@ class KafkaToNeo4jTransformer:
         topic_name = "companies"
 
         # Write extracted streamed micro batch to the graph db.
-        query = grdf.writeStream.format("org.neo4j.spark.DataSource") \
+        self.query = grdf.writeStream.format("org.neo4j.spark.DataSource") \
             .option("url", db_uri) \
             .option("save.mode", "Overwrite") \
             .option("authentication.type", "basic") \
@@ -99,16 +103,16 @@ class KafkaToNeo4jTransformer:
                     self.__db_cfg.get("password")) \
             .option("checkpointLocation", "/tmp/checkpoint/myCheckPoint") \
             .option("labels", self.get_node_label(topic_name)) \
-            .option("node.keys", "attrs.company_id") \
+            .option("node.keys", self.get_node_pk(topic_name)) \
             .start()
 
-        query.awaitTermination()
+        self.query.awaitTermination()
 
         # TODO: fault-tolerance with checkpointLocation
         # For fault-tolerance, use option checkpointLocation
         #    for each output stream separately.
 
-    def stop_stream_query(self, query, wait_time):
+    def stop_stream_query(self, query, wait_time_seconds):
         """Stop a running streaming query"""
         while query.isActive:
             msg = query.status['message']
@@ -122,7 +126,7 @@ class KafkaToNeo4jTransformer:
 
             # Wait for the termination to happen
             logging.info('Awaiting termination...')
-            query.awaitTermination(wait_time)
+            query.awaitTermination(wait_time_seconds)
 
     def stop(self):
         # TODO: shutdown hook, monitoring stream progress
@@ -133,7 +137,14 @@ class KafkaToNeo4jTransformer:
         if topic_name not in self.__topic_to_node_map.keys():
             raise Exception(
                     f"Cannot find node_label for the given topic_name '{topic_name}'")
-        return self.__topic_to_node_map.get(topic_name)
+        return self.__topic_to_node_map.get(topic_name).get("label")
+
+    def get_node_pk(self, topic_name: str) -> str:
+        assert topic_name is not None, "get_node_label: topic_name is empty or None"
+        if topic_name not in self.__topic_to_node_map.keys():
+            raise Exception(
+                    f"Cannot find node and its primary key for the given topic_name '{topic_name}'")
+        return self.__topic_to_node_map.get(topic_name).get("pk")
 
 
 if __name__ == "__main__":
@@ -142,9 +153,9 @@ if __name__ == "__main__":
 
     # topic to node mapping
     topic_to_node_map = {
-              "companies": "Organization",
-              "acq_companies": "Subsidiary",
-              "persons": "Person"
+            "companies": {"label": "Organization", "pk": "company_id"},
+            "acq_companies": {"label": "Subsidiary", "pk": "parent_company_id, acquired_company_id"},
+            "persons": {"label": "Person", "pk": "person_id"}
             }
 
     # read from kafka, transform and load into graph db
