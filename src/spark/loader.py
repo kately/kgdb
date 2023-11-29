@@ -42,7 +42,8 @@ org_schema = T.StructType([
 
 class KafkaToNeo4jTransformer:
     def __init__(self, config: str, topic_to_node_map: Dict):
-        assert topic_to_node_map is not None and len(topic_to_node_map) > 0, "topic_to_node_map mapping is required"
+        assert topic_to_node_map is not None and len(topic_to_node_map) > 0, \
+               "topic_to_node_map mapping is required"
 
         self.__config = load_file(config)
         self.__kf_cfg = self.__config.get("kafka")
@@ -72,7 +73,8 @@ class KafkaToNeo4jTransformer:
         kafka_df = self.spark.readStream \
             .format("kafka") \
             .option("kafka.bootstrap.servers", kf_uri) \
-            .option("subscribe", ",".join(list(self.__topic_to_node_map.keys()))) \
+            .option("subscribe",
+                    ",".join(list(self.__topic_to_node_map.keys()))) \
             .option("startingOffsets", "earliest") \
             .load()
 
@@ -133,17 +135,21 @@ class KafkaToNeo4jTransformer:
         self.spark.stop()
 
     def get_node_label(self, topic_name: str) -> str:
-        assert topic_name is not None, "get_node_label: topic_name is empty or None"
+        assert topic_name is not None, \
+               "get_node_label: topic_name is empty or None"
         if topic_name not in self.__topic_to_node_map.keys():
             raise Exception(
-                    f"Cannot find node_label for the given topic_name '{topic_name}'")
+                    f"Cannot find node_label for \
+                      the given topic_name '{topic_name}'")
         return self.__topic_to_node_map.get(topic_name).get("label")
 
     def get_node_pk(self, topic_name: str) -> str:
-        assert topic_name is not None, "get_node_label: topic_name is empty or None"
+        assert topic_name is not None, \
+               "get_node_label: topic_name is empty or None"
         if topic_name not in self.__topic_to_node_map.keys():
             raise Exception(
-                    f"Cannot find node and its primary key for the given topic_name '{topic_name}'")
+                    f"Cannot find node and its primary key \
+                      for the given topic_name '{topic_name}'")
         return self.__topic_to_node_map.get(topic_name).get("pk")
 
 
@@ -154,7 +160,8 @@ if __name__ == "__main__":
     # topic to node mapping
     topic_to_node_map = {
             "companies": {"label": "Organization", "pk": "company_id"},
-            "acq_companies": {"label": "Subsidiary", "pk": "parent_company_id, acquired_company_id"},
+            "acq_companies": {"label": "Subsidiary",
+                              "pk": "parent_company_id, acquired_company_id"},
             "persons": {"label": "Person", "pk": "person_id"}
             }
 
