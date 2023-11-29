@@ -48,10 +48,11 @@ class CompaniesSourcer(DataSourcer):
         # batch update with map
         result = txn.run(
             """
+            WITH datetime({timezone: 'UTC'}) AS currentdt
             UNWIND $batch AS obj
             MERGE (o:Organization {company_id: obj.company_id})
-            ON CREATE SET o = obj, o.created = timestamp()
-            ON MATCH SET o = obj, o.accessTime = timestamp()
+            ON CREATE SET o = obj, o.created = currentdt
+            ON MATCH SET o = obj, o.updated = currentdt
             RETURN o.org_id AS org_id
             """,
             batch=batch
@@ -82,18 +83,19 @@ class AcquiredCompaniesSourcer(DataSourcer):
         result = txn.run(
             """
             // add or update subcompany
+            WITH datetime({timezone: 'UTC'}) AS currentdt
             UNWIND $batch AS obj
             MERGE (s:Subsidiary {acquired_company_id: obj.acquired_company_id})
-            ON CREATE SET s = obj, s.created = timestamp()
-            ON MATCH SET s = obj, s.accessTime = timestamp()
+            ON CREATE SET s = obj, s.created = currentdt
+            ON MATCH SET s = obj, s.updated = currentdt
 
             // find parent company ID and link to it
             // add or update relationship
-            WITH s AS sub
+            WITH s AS sub, datetime({timezone: 'UTC'}) AS currentdt
             MATCH (org:Organization {company_id: sub.parent_company_id})
             MERGE (org)-[r:ACQUIRED]->(sub)
-            ON CREATE SET r.created = timestamp()
-            ON MATCH SET r.accessTime = timestamp()
+            ON CREATE SET r.created = currentdt
+            ON MATCH SET r.updated = currentdt
 
             RETURN org.company_id AS org_id,
                    sub.acquired_company_id AS sub_org_id
@@ -132,17 +134,18 @@ class EmployedPersonsSourcer(DataSourcer):
         result = txn.run(
             """
             // add or update person/employee
+            WITH datetime({timezone: 'UTC'}) AS currentdt
             UNWIND $batch AS obj
             MERGE (p:Person {person_id: obj.person_id})
-            ON CREATE SET p = obj, p.created = timestamp()
-            ON MATCH SET p = obj, p.accessTime = timestamp()
+            ON CREATE SET p = obj, p.created = currentdt
+            ON MATCH SET p = obj, p.updated = currentdt
 
             // add org and employee workAt relationship
-            WITH p AS employee
+            WITH p AS employee, datetime({timezone: 'UTC'}) AS currentdt
             MATCH (org:Organization {company_id: employee.company_id})
             MERGE (employee)-[r:WORKS_AT]->(org)
-            ON CREATE SET r.created = timestamp()
-            ON MATCH SET r.accessTime = timestamp()
+            ON CREATE SET r.created = currentdt
+            ON MATCH SET r.updated = currentdt
 
             // remove workAt or ex- employment status
             // mark and update all companies along an employee employment path
@@ -151,15 +154,16 @@ class EmployedPersonsSourcer(DataSourcer):
             // 1) Add ex- relationship outside date range
             // 2) Remove the existing workAt relationship
             // 3) Skip/ignore update to relationship for null date values.
-            WITH employee as p, date() AS current_date
+            WITH employee as p, date() AS current_date,
+                 datetime({timezone: 'UTC'}) AS currentdt
             MATCH (emp:Person WHERE emp.person_id = p.person_id)
             MATCH (org:Organization)
             WHERE org.company_id = p.company_id AND
                   p.end_date IS NOT NULL AND
                   date(datetime(replace(p.end_date, " ", "T"))) < current_date
             MERGE (p)-[ex:EX_EMPLOYEE_OF]->(org)
-            ON CREATE SET ex.created = timestamp()
-            ON MATCH SET ex.accessTime = timestamp()
+            ON CREATE SET ex.created = currentdt
+            ON MATCH SET ex.updated = currentdt
             // remove workAt relationship for ex-employee
             WITH p
             MATCH (p)-[r:WORKS_AT]->(org)

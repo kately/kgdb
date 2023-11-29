@@ -6,6 +6,7 @@ import pyspark.sql.types as T
 import pyspark.sql.functions as F
 from typing import Dict, List
 from common.utils import load_file
+from datetime import datetime, timezone
 from pyspark.sql import SparkSession
 
 
@@ -23,6 +24,7 @@ def decode_json_column(value: str) -> List:
 
 
 # TODO: register UDF
+current_utc_datetime_udf = F.udf(lambda: datetime.now(timezone.utc).timestamp() * 1000)  # noqa
 decode_json_column_udf = F.udf(decode_json_column)
 decode_record_schema_udf = (lambda x, schema: F.from_json(x, schema))
 expand_json_to_array_udf = (lambda x: F.split(decode_json_column_udf(x), "\|"))   # noqa
@@ -81,12 +83,16 @@ class KafkaToNeo4jTransformer:
         # Extract encoded 'value' column of a batch of json string
         # A batch could consist of one or more json kafka records.
         # Decode batch and explode the batch of multiple records into rows.
+        # Note-1: Note that F.current_timestamp() already in UTC
+        #
+        # TODO: data lineage with system time: use created vs updated or both?
         rows = expand_jsonarray_to_rows_udf(F.col("value"))
         grdf = kafka_df.select(rows.alias("cols")) \
                        .select(F.col("cols"),
                                flatten_jsondict_to_columns_udf(
                                    F.col("cols"), org_schema).alias("attrs")) \
-                       .select(F.col("attrs.*"))
+                       .select(F.col("attrs.*"),
+                               F.current_timestamp().alias("updated"))
         grdf.printSchema()
 
         # TODO: identify the label to use for the given batch
@@ -106,6 +112,7 @@ class KafkaToNeo4jTransformer:
             .option("checkpointLocation", "/tmp/checkpoint/myCheckPoint") \
             .option("labels", self.get_node_label(topic_name)) \
             .option("node.keys", self.get_node_pk(topic_name)) \
+            .option("batch.size", 100000) \
             .start()
 
         self.query.awaitTermination()

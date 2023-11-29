@@ -14,4 +14,4 @@ export PYTHONPATH="${app_home}/src"
 # flake8 
 
 # run app
-python3 src/kafka/producer.py
+python3 src/kafka/producer.py "$@"

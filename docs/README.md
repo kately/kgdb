@@ -51,7 +51,7 @@ The docker image is build to run PySpark.
    ./bin/kafka-topics.sh --create Y
    
    # Generate and run message updates
-   ./bin/kafka-producer.sh
+   ./bin/kafka-producer.sh --file data/chgs_companies_1.data
 
    # Run spark load
    ./bin/pyspark-loader.sh 
@@ -62,6 +62,15 @@ The docker image is build to run PySpark.
    # Launch Cypher shell to query the KG/Neo4J.
    make neo4j-shell
 
-   # Querying Neo4J - return the nodes
+   # Querying Neo4J - return all nodes
    MATCH(n) RETURN n;
+
+   # Find nodes that were either created or updated in the last 15 minutes
+   WITH datetime() AS now, 15 AS diff_in_min
+   MATCH (n)
+   WHERE duration.inSeconds(n.updated, now).minutes <= diff_in_min
+   RETURN n;
+
+   # Find node that is identified by company_id = 6792948
+   MATCH(n) WHERE n.company_id = 6792948 RETURN n;
    ```
