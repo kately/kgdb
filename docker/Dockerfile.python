@@ -36,6 +36,7 @@ RUN apt-get install -y --no-install-recommends openjdk-${JAVA_VERSION}-jdk && \
 
 RUN pip3 install pyspark
 
+# https://spark.apache.org/downloads.html
 RUN mkdir -p /opt && \
     cd /opt && \
     curl http://dlcdn.apache.org/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop3.tgz | tar -zx && \
